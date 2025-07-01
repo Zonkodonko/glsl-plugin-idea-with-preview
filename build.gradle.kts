@@ -33,6 +33,20 @@ dependencies {
     testImplementation("org.opentest4j:opentest4j:1.3.0")
 }
 
+intellijPlatform {
+    pluginConfiguration {
+        version = pluginVersion
+        description = file("plugin-info/description.html").readText()
+        changeNotes = changelog.renderItem(changelog.get(pluginVersion), Changelog.OutputType.HTML)
+        ideaVersion {
+            sinceBuild = "223"
+        }
+    }
+    publishing {
+        token = System.getenv("PUBLISH_TOKEN")
+    }
+}
+
 tasks {
     compileJava {
         sourceCompatibility = JavaVersion.VERSION_21.majorVersion
@@ -41,21 +55,6 @@ tasks {
 
     runIde {
         maxHeapSize = "6g"
-    }
-
-    patchPluginXml {
-        val descriptionHtml = file("plugin-info/description.html").readText()
-        changeNotes = changelog.renderItem(changelog.get(version.toString()), Changelog.OutputType.HTML)
-        pluginDescription = descriptionHtml
-        sinceBuild = "223"
-    }
-
-    changelog {
-        version = pluginVersion
-    }
-
-    publishPlugin {
-        token = System.getenv("PUBLISH_TOKEN")
     }
 }
 
