@@ -580,7 +580,7 @@ init_declarator_variable
 single_declaration
     ::= fully_specified_type variable_identifier array_specifier? EQUAL initializer
     |   fully_specified_type variable_identifier array_specifier
-    |   fully_specified_type variable_identifier?
+    |   fully_specified_type pointer_specifier? variable_identifier?
     {   pin(".*")=4 }
 
 private initializer
@@ -874,7 +874,7 @@ private parameter_declaration
     ::= type_qualifier? (parameter_declarator | parameter_type_specifier)
 
 parameter_declarator
-    ::= type_specifier variable_identifier array_specifier?
+    ::= type_specifier pointer_specifier? variable_identifier array_specifier?
 
 private parameter_type_specifier
     ::= type_specifier
@@ -899,7 +899,7 @@ private constructor_header
     |   constructor_identifier LEFT_PAREN
 
 private function_identifier
-    ::= variable_identifier array_specifier?
+    ::= pointer_specifier? variable_identifier array_specifier?
     |   non_uniform_qualifier
 
 private constructor_identifier
@@ -909,7 +909,7 @@ private constructor_identifier
 // *** Struct ***
 // **************
 block_structure_wrapper ::=
-    block_structure (variable_identifier array_specifier?)?
+    block_structure (pointer_specifier? variable_identifier array_specifier?)?
 
 block_structure
     ::= type_qualifier type_name LEFT_BRACE struct_declaration_list RIGHT_BRACE
@@ -933,7 +933,7 @@ private struct_declarator_list
     {   recoverWhile=recover_struct_declaration_list    }
 
 struct_declarator
-    ::= variable_identifier array_specifier?
+    ::= pointer_specifier? variable_identifier array_specifier?
 
 // **************
 // *** Types ****
@@ -1326,6 +1326,9 @@ private type_name_list
 
 array_specifier
     ::= (LEFT_BRACKET expr_no_assignment? RIGHT_BRACKET)+
+
+pointer_specifier
+    ::= STAR
 
 private type_parameter_specifier_list
     ::= unary_expr (COMMA unary_expr)*
