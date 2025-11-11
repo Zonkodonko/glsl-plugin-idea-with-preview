@@ -47,6 +47,9 @@
     // Expression
     implements("expr")="glsl.plugin.psi.GlslExprType"
     mixin("expr")="glsl.plugin.psi.GlslExprTypeImpl"
+    // Include & Import
+    mixin("pp_include_declaration")="glsl.plugin.psi.GlslPpInclude"
+    mixin("pp_import_declaration")="glsl.plugin.psi.GlslPpImport"
 
 
     extends("expr_no_assignment|assignment_expr")=expr
@@ -77,6 +80,7 @@
         PP_PRAGMA="#pragma"
         PP_EXTENSION="#extension"
         PP_INCLUDE="#include"
+        PP_IMPORT="#import"
         PP_LINE="#line"
         MACRO_LINE="__LINE__"
         MACRO_FILE="__FILE__"
@@ -1447,6 +1451,7 @@ pp_statement
     ::=  (PP_PRAGMA | PP_ERROR) <<ppText>> (PP_END|<<eof>>)
     |    (PP_UNDEF|PP_IFDEF|PP_IFNDEF) variable_identifier (PP_END|<<eof>>)
     |    pp_include_declaration (END_INCLUDE|<<eof>>)
+    |    pp_import_declaration (END_INCLUDE|<<eof>>)
     |    pp_define_function (PP_END|<<eof>>)
     |    pp_define_object (PP_END|<<eof>>)
     |    pp_conditional (PP_END|<<eof>>)
@@ -1459,6 +1464,10 @@ pp_statement
 pp_include_declaration
     ::= PP_INCLUDE (STRING_LITERAL | (LEFT_ANGLE INCLUDE_PATH RIGHT_ANGLE))
     {   pin(".*")=1 generateTokenAccessors=true }
+
+pp_import_declaration
+    ::= PP_IMPORT LEFT_ANGLE IDENTIFIER COLON INCLUDE_PATH RIGHT_ANGLE
+    { pin(".*")=1 generateTokenAccessors=true }
 
 private pp_version_declaration
     ::= PP_VERSION INTCONSTANT ('core'|'es'|'compatibility')?
