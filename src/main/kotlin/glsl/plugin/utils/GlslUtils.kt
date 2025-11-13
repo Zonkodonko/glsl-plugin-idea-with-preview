@@ -212,7 +212,9 @@ object GlslUtils {
     @JvmStatic
     private fun resolveMarkerSourceRoot(baseFile: VirtualFile): VirtualFile? {
         baseFile.searchParents { current ->
-            current.findFile(".glsl_idea_root")?.let { return it }
+            current.findFile(".glsl_idea_root")?.let {
+                return current
+            }
         }
         return null
     }
@@ -356,4 +358,3 @@ object GlslUtils {
         }
     }
 }
-
