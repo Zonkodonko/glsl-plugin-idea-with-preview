@@ -1,6 +1,6 @@
 # GLSL Plugin Changelog
 
-## [1.1.6-fpfork]
+## [1.1.6-fpfork-01]
 
 ### Fixed
 - Fixed relative include paths when including other files from different directories
