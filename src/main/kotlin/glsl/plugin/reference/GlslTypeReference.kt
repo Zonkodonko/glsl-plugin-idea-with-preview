@@ -104,6 +104,7 @@ class GlslTypeReference(private val element: GlslType, textRange: TextRange) : G
      */
     override fun lookupInExternalDeclaration(relativeTo: VirtualFile?, externalDeclaration: GlslExternalDeclaration?) {
         lookupInIncludeDeclaration(relativeTo, externalDeclaration?.ppStatement?.ppIncludeDeclaration)
+        lookupInImportDeclaration(externalDeclaration?.ppStatement?.ppImportDeclaration)
         resolveDeclarationType(externalDeclaration?.declaration)
     }
 

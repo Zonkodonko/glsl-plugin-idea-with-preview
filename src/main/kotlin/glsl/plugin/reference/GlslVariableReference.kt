@@ -248,6 +248,7 @@ class GlslVariableReference(private val element: GlslIdentifier, textRange: Text
     private fun lookupInPpStatement(file: VirtualFile?, ppStatement: GlslPpStatement?) {
         if (ppStatement == null) return
         lookupInIncludeDeclaration(file, ppStatement.ppIncludeDeclaration)
+        lookupInImportDeclaration(ppStatement.ppImportDeclaration)
         findReferenceInElement(ppStatement.ppDefineObject)
         findReferenceInElement(ppStatement.ppDefineFunction)
     }

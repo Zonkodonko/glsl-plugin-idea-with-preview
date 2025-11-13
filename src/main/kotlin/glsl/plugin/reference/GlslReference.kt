@@ -1,6 +1,7 @@
 package glsl.plugin.reference
 
 import com.intellij.openapi.util.TextRange
+import com.intellij.openapi.vfs.LocalFileSystem
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFile
@@ -12,10 +13,12 @@ import glsl.plugin.psi.named.GlslNamedElement
 import glsl.plugin.psi.named.GlslNamedVariable
 import glsl.plugin.reference.FilterType.CONTAINS
 import glsl.plugin.reference.FilterType.EQUALS
+import glsl.plugin.utils.GlslUtils.getImportPsiFile
 import glsl.plugin.utils.GlslUtils.getPathStringFromInclude
 import glsl.plugin.utils.GlslUtils.getVirtualFile
 import glsl.psi.interfaces.GlslExternalDeclaration
 import glsl.psi.interfaces.GlslFunctionDefinition
+import glsl.psi.interfaces.GlslPpImportDeclaration
 import glsl.psi.interfaces.GlslPpIncludeDeclaration
 import glsl.psi.interfaces.GlslStatement
 import java.util.Stack
@@ -140,6 +143,29 @@ abstract class GlslReference(private val element: GlslIdentifier, textRange: Tex
         } finally {
             if (includedFilesStack.size != pos)
                 throw StopLookupException()
+            includedFilesStack.pop()
+        }
+    }
+
+    protected fun lookupInImportDeclaration(ppImportDeclaration: GlslPpImportDeclaration?) {
+        if (ppImportDeclaration == null) return
+        includedFilesStack.push(ppImportDeclaration.containingFile)
+
+        val pos = includedFilesStack.size
+        try {
+            val psiFile = getImportPsiFile(project, ppImportDeclaration).firstOrNull() ?: return
+            val vf = psiFile.virtualFile ?: return
+
+            if (includedFilesStack.contains(psiFile)) return
+
+            val externalDeclarations = psiFile.childrenOfType<GlslExternalDeclaration>()
+            for (externalDeclaration in externalDeclarations) {
+                lookupInExternalDeclaration(vf, externalDeclaration)
+            }
+        } finally {
+            if (includedFilesStack.size != pos) {
+                throw StopLookupException()
+            }
             includedFilesStack.pop()
         }
     }
