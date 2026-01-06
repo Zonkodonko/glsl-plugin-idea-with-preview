@@ -4,16 +4,13 @@ import org.jetbrains.grammarkit.tasks.GenerateLexerTask
 import org.jetbrains.intellij.platform.gradle.IntelliJPlatformType
 import org.jetbrains.intellij.platform.gradle.TestFrameworkType
 
-val grammarKitMissingDependencies: Configuration by configurations.creating
-
 plugins {
     id("java")
     id("idea")
     alias(libs.plugins.kotlin) // Kotlin support
     alias(libs.plugins.intelliJPlatform) // IntelliJ Platform Gradle Plugin
     alias(libs.plugins.changelog) // Gradle Changelog Plugin
-
-    id("org.jetbrains.grammarkit") version ("2022.3.2.2")
+    alias(libs.plugins.grammarKit)
 }
 
 val pluginVersion: String by project
@@ -43,10 +40,6 @@ dependencies {
     }
     testImplementation(libs.junit)
     testImplementation(libs.opentest4j)
-
-    grammarKitMissingDependencies("it.unimi.dsi:fastutil:8.5.15")
-    grammarKitMissingDependencies("org.jetbrains.kotlinx:kotlinx-collections-immutable:0.4.0")
-    grammarKitMissingDependencies("org.jetbrains.intellij.deps:asm-all:9.6.1")
 }
 
 intellijPlatform {
@@ -124,7 +117,6 @@ run {
             targetOutputDir = highlightLexerDir.map { it.dir(rootPackagePath) }
         }
         generateParser {
-            classpath += files(grammarKitMissingDependencies)
             purgeOldFiles = true
             sourceFile = grammarSources.file("GlslGrammar.bnf")
             targetRootOutputDir = parserDir
