@@ -7,6 +7,7 @@ import org.jetbrains.intellij.platform.gradle.TestFrameworkType
 plugins {
     id("java")
     id("idea")
+    kotlin("plugin.serialization") version "2.2.0"
     alias(libs.plugins.kotlin) // Kotlin support
     alias(libs.plugins.intelliJPlatform) // IntelliJ Platform Gradle Plugin
     alias(libs.plugins.changelog) // Gradle Changelog Plugin
@@ -40,6 +41,39 @@ dependencies {
     }
     testImplementation(libs.junit)
     testImplementation(libs.opentest4j)
+
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.8.0")
+
+    implementation(platform("org.lwjgl:lwjgl-bom:3.3.3"))
+    implementation("org.lwjgl:lwjgl")
+    implementation("org.lwjgl:lwjgl-opengl")
+
+    // Fix für NoClassDefFoundError: org/lwjgl/system/jawt/JAWT
+    implementation("org.lwjgl:lwjgl-jawt")
+
+    runtimeOnly("org.lwjgl:lwjgl::natives-windows")
+    runtimeOnly("org.lwjgl:lwjgl-opengl::natives-windows")
+
+    runtimeOnly("org.lwjgl:lwjgl::natives-linux")
+    runtimeOnly("org.lwjgl:lwjgl-opengl::natives-linux")
+
+    runtimeOnly("org.lwjgl:lwjgl::natives-macos")
+    runtimeOnly("org.lwjgl:lwjgl-opengl::natives-macos")
+
+    // AWTGLCanvas kommt bei dir aus org.lwjgl.opengl.awt.* -> das ist typischerweise lwjgl3-awt
+    // (und du willst Transitives/Natives kontrollieren)
+    implementation("org.lwjglx:lwjgl3-awt:0.2.3") { // [[2]]
+        isTransitive = false
+    }
+}
+
+configurations.configureEach {
+    resolutionStrategy.eachDependency {
+        if (requested.group == "org.lwjgl") {
+            useVersion("3.3.3")
+            because("Verhindert LWJGL-Mischversionen, die zu NoSuchMethodError führen")
+        }
+    }
 }
 
 intellijPlatform {
@@ -131,6 +165,35 @@ run {
         }
         compileKotlin {
             dependsOn("generateGrammarClean")
+        }
+
+        runIde { //diables kubenetes because its trash and dumps our logs with bullshit
+            maxHeapSize = "6g"
+
+            doFirst {
+                val disabledIds = listOf(
+                    "com.intellij.kubernetes",
+                )
+
+                val sandboxRoot = layout.buildDirectory.dir("idea-sandbox").get().asFile
+
+                val candidateConfigDirs = sandboxRoot
+                    .listFiles()
+                    ?.filter { it.isDirectory }
+                    ?.map { it.resolve("config") }
+                    ?.filter { it.isDirectory }
+                    .orEmpty()
+
+                val configDir = when {
+                    candidateConfigDirs.size == 1 -> candidateConfigDirs.single()
+                    candidateConfigDirs.isNotEmpty() -> candidateConfigDirs.maxBy { it.lastModified() } // nimm die "aktuellste"
+                    else -> sandboxRoot.resolve("config") // Fallback für ältere Layouts
+                }
+
+                configDir.mkdirs()
+                configDir.resolve("disabled_plugins.txt")
+                    .writeText(disabledIds.joinToString(System.lineSeparator()))
+            }
         }
     }
 }
