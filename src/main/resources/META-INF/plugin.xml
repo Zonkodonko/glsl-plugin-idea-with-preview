@@ -93,6 +93,8 @@
                 canWorkInDumbMode="true"
         />
 
+        <configurationType implementation="glsl.plugin.preview.run.settings.ShaderRunConfigurationType"/>
+
     </extensions>
 
     <actions>

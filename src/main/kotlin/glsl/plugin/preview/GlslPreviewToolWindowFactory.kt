@@ -5,6 +5,7 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Disposer
 import com.intellij.openapi.wm.ToolWindow
 import com.intellij.openapi.wm.ToolWindowFactory
+import glsl.plugin.preview.panels.GlslPreviewPanel
 
 class GlslPreviewToolWindowFactory : ToolWindowFactory, DumbAware {
 
