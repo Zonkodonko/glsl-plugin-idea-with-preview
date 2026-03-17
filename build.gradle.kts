@@ -98,6 +98,7 @@ intellijPlatform {
 }
 
 tasks {
+    val buildSearchableOptionsEnabled = providers.gradleProperty("buildSearchableOptionsEnabled").map(String::toBoolean).orElse(false)
     compileJava {
         sourceCompatibility = JavaVersion.VERSION_21.majorVersion
         targetCompatibility = JavaVersion.VERSION_21.majorVersion
