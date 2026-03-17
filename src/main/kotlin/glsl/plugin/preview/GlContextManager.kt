@@ -234,7 +234,7 @@ class GlContextManager : Disposable {
         glBindBuffer(GL_ARRAY_BUFFER, positionBuffer)
         glVertexAttribPointer(positionLocation, 2, GL_FLOAT, false, 0, 0)
 
-        val time = (System.nanoTime() - startNs) / 1_000_000.0f //time in milliseconds
+        val time = (System.nanoTime() - startNs) / 1_000_000_000.0f //time in seconds
         glUniform1f(uTimeLocation, time)
         glUniform2f(uResolutionLocation, w.toFloat(), h.toFloat())
 
