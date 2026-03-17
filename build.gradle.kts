@@ -44,12 +44,10 @@ dependencies {
 
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.8.0")
 
-    implementation(platform("org.lwjgl:lwjgl-bom:3.3.3"))
-    implementation("org.lwjgl:lwjgl")
-    implementation("org.lwjgl:lwjgl-opengl")
-
-    // Fix für NoClassDefFoundError: org/lwjgl/system/jawt/JAWT
-    implementation("org.lwjgl:lwjgl-jawt")
+    implementation(platform(libs.lwjgl.bom))
+    implementation(libs.lwjgl)
+    implementation(libs.lwjgl.opengl)
+    implementation(libs.lwjgl.jawt)
 
     runtimeOnly("org.lwjgl:lwjgl::natives-windows")
     runtimeOnly("org.lwjgl:lwjgl-opengl::natives-windows")
@@ -60,9 +58,7 @@ dependencies {
     runtimeOnly("org.lwjgl:lwjgl::natives-macos")
     runtimeOnly("org.lwjgl:lwjgl-opengl::natives-macos")
 
-    // AWTGLCanvas kommt bei dir aus org.lwjgl.opengl.awt.* -> das ist typischerweise lwjgl3-awt
-    // (und du willst Transitives/Natives kontrollieren)
-    implementation("org.lwjglx:lwjgl3-awt:0.2.3") { // [[2]]
+    implementation(libs.lwjgl3.awt) {
         isTransitive = false
     }
 }
@@ -70,8 +66,8 @@ dependencies {
 configurations.configureEach {
     resolutionStrategy.eachDependency {
         if (requested.group == "org.lwjgl") {
-            useVersion("3.3.3")
-            because("Verhindert LWJGL-Mischversionen, die zu NoSuchMethodError führen")
+            useVersion(libs.versions.lwjgl.get())
+            because("Alle LWJGL-Artefakte müssen binär kompatibel zu lwjgl3-awt sein")
         }
     }
 }
@@ -98,7 +94,8 @@ intellijPlatform {
 }
 
 tasks {
-    val buildSearchableOptionsEnabled = providers.gradleProperty("buildSearchableOptionsEnabled").map(String::toBoolean).orElse(false)
+    val buildSearchableOptionsEnabled =
+        providers.gradleProperty("buildSearchableOptionsEnabled").map(String::toBoolean).orElse(false)
     compileJava {
         sourceCompatibility = JavaVersion.VERSION_21.majorVersion
         targetCompatibility = JavaVersion.VERSION_21.majorVersion

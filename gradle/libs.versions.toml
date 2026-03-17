@@ -2,6 +2,8 @@
 # libraries
 junit = "4.13.2"
 opentest4j = "1.3.0"
+lwjgl = "3.3.6"
+lwjgl3-awt = "0.2.3"
 
 # plugins
 changelog = "2.5.0"
@@ -14,6 +16,11 @@ grammarKit = "2023.3.0.1"
 [libraries]
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 opentest4j = { group = "org.opentest4j", name = "opentest4j", version.ref = "opentest4j" }
+lwjgl-bom = { group = "org.lwjgl", name = "lwjgl-bom", version.ref = "lwjgl" }
+lwjgl = { group = "org.lwjgl", name = "lwjgl" }
+lwjgl-opengl = { group = "org.lwjgl", name = "lwjgl-opengl" }
+lwjgl-jawt = { group = "org.lwjgl", name = "lwjgl-jawt" }
+lwjgl3-awt = { group = "org.lwjglx", name = "lwjgl3-awt", version.ref = "lwjgl3-awt" }
 
 [plugins]
 changelog = { id = "org.jetbrains.changelog", version.ref = "changelog" }
