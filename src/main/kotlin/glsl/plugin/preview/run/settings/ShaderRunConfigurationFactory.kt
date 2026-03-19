@@ -11,8 +11,8 @@ class ShaderRunConfigurationFactory(type: ShaderRunConfigurationType) : Configur
         return ShaderRunConfiguration(project, this, name = "Fragment Shader")
     }
 
-    override fun getOptionsClass(): Class<out ShaderOptions> {
-        return ShaderOptions::class.java
+    override fun getOptionsClass(): Class<out FragShaderRunOptions> {
+        return FragShaderRunOptions::class.java
     }
 
     override fun getId(): @NonNls String {

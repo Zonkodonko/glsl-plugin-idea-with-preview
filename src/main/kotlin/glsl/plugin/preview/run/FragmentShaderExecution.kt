@@ -10,14 +10,14 @@ import com.intellij.execution.process.NopProcessHandler
 import com.intellij.execution.runners.ProgramRunner
 import com.intellij.execution.ui.ConsoleView
 import com.intellij.execution.ui.ConsoleViewContentType
-import com.intellij.openapi.editor.Document
-import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFileManager
 import com.intellij.openapi.wm.ToolWindowManager
 import glsl.plugin.preview.GlContextManager
+import glsl.plugin.preview.run.settings.FragShaderRunOptions
 
-class FragmentShaderRunProfileState(private val project: Project, private val fragmentFilePath: String) : RunProfileState {
+class FragmentShaderRunProfileState(private val project: Project, private val options: FragShaderRunOptions) :
+    RunProfileState {
 
     val glContextManager = GlContextManager.getInstance(project)
 
@@ -41,20 +41,20 @@ class FragmentShaderRunProfileState(private val project: Project, private val fr
             return DefaultExecutionResult(consoleView, NopProcessHandler())
         }
 
+//        val fragmentFilePath = options.fragmentFile!!;
+//        val shaderFile = VirtualFileManager.getInstance().findFileByUrl(fragmentFilePath)
+//        if(shaderFile == null) {
+//            consoleView.print("Could not find file: $fragmentFilePath", ConsoleViewContentType.ERROR_OUTPUT);
+//            return DefaultExecutionResult(consoleView, NopProcessHandler())
+//        }
+//
+//        val document: Document? = FileDocumentManager.getInstance().getDocument(shaderFile)
+//        if (document == null) {
+//            consoleView.print("No editor document found", ConsoleViewContentType.ERROR_OUTPUT)
+//            return DefaultExecutionResult(consoleView, NopProcessHandler())
+//        }
 
-        val shaderFile = VirtualFileManager.getInstance().findFileByUrl(fragmentFilePath)
-        if(shaderFile == null) {
-            consoleView.print("Could not find file: $fragmentFilePath", ConsoleViewContentType.ERROR_OUTPUT);
-            return DefaultExecutionResult(consoleView, NopProcessHandler())
-        }
-        val document: Document? = FileDocumentManager.getInstance().getDocument(shaderFile)
-
-        if (document == null) {
-            consoleView.print("No editor document found", ConsoleViewContentType.ERROR_OUTPUT)
-            return DefaultExecutionResult(consoleView, NopProcessHandler())
-        }
-
-        glContextManager.queueCompile(document,processHandler);
+        glContextManager.queueCompile(options, processHandler); //todo maybe implement some kind of already baker compiler settings
         return DefaultExecutionResult(consoleView, processHandler);
     }
 }

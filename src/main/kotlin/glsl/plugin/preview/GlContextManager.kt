@@ -7,6 +7,8 @@ import com.intellij.openapi.editor.Document
 import com.intellij.openapi.project.Project
 import fleet.util.computeIfAbsentShim
 import glsl.plugin.preview.run.GLProcessHandler
+import glsl.plugin.preview.run.settings.FragShaderRunOptions
+import glsl.plugin.preview.run.settings.UniformType
 import glsl.plugin.utils.exceptions.ShaderCompilerException
 import org.lwjgl.opengl.GL
 import org.lwjgl.opengl.GL20.*
@@ -16,7 +18,7 @@ import java.awt.event.ComponentEvent
 
 class GlContextManager : Disposable {
 
-    private lateinit var glCanvas: AWTGLCanvas;
+    private var glCanvas: AWTGLCanvas;
     private val project: Project;
 
 
@@ -28,6 +30,7 @@ class GlContextManager : Disposable {
     // uniforms (optional)
     private var uTimeLocation = -1
     private var uResolutionLocation = -1
+    private var uMouseLocation = -1
 
     // rendering variables
     private var positionLocation = -1
@@ -38,7 +41,7 @@ class GlContextManager : Disposable {
     private var pendingCompile: CompileRun? = null
     private var pendingStop: Boolean = false
 
-    private data class CompileRun(val document: Document, val processHandler: GLProcessHandler);
+    private data class CompileRun(val settings: FragShaderRunOptions, val processHandler: GLProcessHandler);
 
     val processTerminatedListener = object : ProcessListener {
         override fun processTerminated(processEvent: ProcessEvent) =
@@ -139,16 +142,16 @@ class GlContextManager : Disposable {
      * Add a compile request to the queue. All glsl logs will be printed to the process handler.
      * The request will be handled with the next render cycle.
      */
-    fun queueCompile(document: Document, processHandler: GLProcessHandler) {
-        pendingCompile = CompileRun(document, processHandler)
+    fun queueCompile(runOptions: FragShaderRunOptions, processHandler: GLProcessHandler) {
+        pendingCompile = CompileRun(runOptions, processHandler)
     }
 
     private fun compile(compileRun: CompileRun) {
         try {
             println("Compiling shader program:")
             val shaderProgramCompiler = ShaderProgramCompiler(compileRun.processHandler);
-            this.programId = shaderProgramCompiler.getProgramFromFrag(compileRun.document.text)
-            setupRenderContext()
+            this.programId = shaderProgramCompiler.getProgramFromFrag(compileRun.settings.getFragDocument().text)//todo this causes a thread exception because getFragDocument is a psi read operation. Maybe we should cache that instead
+            setupRenderContext(compileRun.settings.getUniformMappings())
             runShaderProgram()
         } catch (e: Exception) {
             if (e is ShaderCompilerException) {
@@ -188,13 +191,11 @@ class GlContextManager : Disposable {
         if (programId != 0) glDeleteProgram(programId)
         if (vertexArrayBuffer != 0) glDeleteBuffers(vertexArrayBuffer)
 
-        if (::glCanvas.isInitialized) {
-            glCanvas.disposeCanvas()
-        }
+        glCanvas.disposeCanvas();
     }
 
 
-    private fun setupRenderContext() {
+    private fun setupRenderContext(uniformMapping: Map<UniformType, String>) {
         println("Setup render context:")
         positionBuffer = glGenBuffers()
         glBindBuffer(GL_ARRAY_BUFFER, positionBuffer)
@@ -213,8 +214,9 @@ class GlContextManager : Disposable {
         //todo make layout feature possible
 
         positionLocation = glGetAttribLocation(programId, "position")
-        uTimeLocation = glGetUniformLocation(programId, "uTime")
-        uResolutionLocation = glGetUniformLocation(programId, "uResolution")
+        uTimeLocation = glGetUniformLocation(programId, uniformMapping.getOrDefault(UniformType.TIME, UniformType.TIME.defaultName))
+        uResolutionLocation = glGetUniformLocation(programId, uniformMapping.getOrDefault(UniformType.RESOLUTION, UniformType.RESOLUTION.defaultName))
+        uMouseLocation = glGetUniformLocation(programId, uniformMapping.getOrDefault(UniformType.MOUSE, UniformType.MOUSE.defaultName))
 
     }
 
@@ -237,8 +239,13 @@ class GlContextManager : Disposable {
         val time = (System.nanoTime() - startNs) / 1_000_000_000.0f //time in seconds
         glUniform1f(uTimeLocation, time)
         glUniform2f(uResolutionLocation, w.toFloat(), h.toFloat())
+        val mousePos = glCanvas.mousePosition;
+        if(mousePos == null) {
+            glUniform2f(uMouseLocation, -1f, -1f)
+        } else {
+            glUniform2f(uMouseLocation, mousePos.x.toFloat(), mousePos.y.toFloat())
+        }
 
         glDrawArrays(GL_TRIANGLES, 0, 6)
-
     }
 }

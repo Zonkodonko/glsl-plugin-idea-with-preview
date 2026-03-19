@@ -5,7 +5,6 @@ import com.intellij.execution.configurations.*
 import com.intellij.execution.runners.ExecutionEnvironment
 import com.intellij.openapi.options.SettingsEditor
 import com.intellij.openapi.project.Project
-import com.intellij.openapi.vfs.VirtualFile
 import glsl.plugin.preview.run.FragmentShaderRunProfileState
 
 
@@ -17,15 +16,15 @@ class ShaderRunConfiguration(
     project: Project,
     factory: ShaderRunConfigurationFactory?,
     name: String?
-) : RunConfigurationBase<ShaderOptions>(project, factory, name) {
+) : RunConfigurationBase<FragShaderRunOptions>(project, factory, name) {
 
 
-    override fun getOptions(): ShaderOptions {
-        return super.getOptions() as ShaderOptions
+    override fun getOptions(): FragShaderRunOptions {
+        return super.getOptions() as FragShaderRunOptions
     }
 
     override fun getState(executor: Executor, environment: ExecutionEnvironment): RunProfileState {
-        return FragmentShaderRunProfileState(project, options.fragmentFile!!)
+        return FragmentShaderRunProfileState(project, options)
     }
 
     override fun getConfigurationEditor(): SettingsEditor<out RunConfiguration> {
@@ -40,8 +39,29 @@ class ShaderRunConfiguration(
         return options.fragmentFile;
     }
 
+    fun setUniformName(uniform: UniformType, name: String) {
+        options.setUniformName(uniform, name);
+    }
 
+    fun getUniforms(): Map<UniformType, String> {
+        return options.getUniformMappings()
+    }
 
+    override fun checkSettingsBeforeRun() {
+        try {
+            options.getFragDocument()
+        } catch (e: NullPointerException) {
+            options.fragmentFile = EMPTY_FILE_INPUT
+            throw RuntimeConfigurationError("Fragment file could not be found.")
+        }
+    }
 
-
+    override fun checkConfiguration() {
+        try {
+            options.getFragDocument()
+        } catch (e: NullPointerException) {
+            options.fragmentFile = EMPTY_FILE_INPUT
+            throw RuntimeConfigurationError("Fragment file could not be found.")
+        }
+    }
 }
