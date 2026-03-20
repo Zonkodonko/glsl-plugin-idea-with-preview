@@ -60,7 +60,7 @@
     name(".*statement|case_label")="statement"
     name(".*operator")="operator"
     name(".*qualifier")="qualifier"
-    name("block_structure|function_prototype|single_declaration")="declration"
+    name("block_structure|function_prototype|single_declaration")="declaration"
     name("type_specifier")="type"
 
     tokens = [
