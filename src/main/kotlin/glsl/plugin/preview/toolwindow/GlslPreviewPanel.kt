@@ -1,4 +1,4 @@
-package glsl.plugin.preview.panels
+package glsl.plugin.preview.toolwindow
 
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.project.Project

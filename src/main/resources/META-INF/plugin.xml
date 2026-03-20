@@ -87,7 +87,7 @@
         <!--        Glsl Preview-->
         <toolWindow
                 id="GLSL Preview"
-                factoryClass="glsl.plugin.preview.GlslPreviewToolWindowFactory"
+                factoryClass="glsl.plugin.preview.toolwindow.GlslPreviewToolWindowFactory"
                 anchor="right"
                 canCloseContents="false"
                 canWorkInDumbMode="true"
