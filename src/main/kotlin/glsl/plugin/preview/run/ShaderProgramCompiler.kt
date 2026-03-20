@@ -1,6 +1,5 @@
-package glsl.plugin.preview
+package glsl.plugin.preview.run
 
-import glsl.plugin.preview.run.GLProcessHandler
 import glsl.plugin.utils.exceptions.ShaderCompilerException
 import org.lwjgl.opengl.GL20.*
 

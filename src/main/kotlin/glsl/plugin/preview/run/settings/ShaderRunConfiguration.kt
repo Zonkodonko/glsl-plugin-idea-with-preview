@@ -14,9 +14,9 @@ import glsl.plugin.preview.run.FragmentShaderRunProfileState
  */
 class ShaderRunConfiguration(
     project: Project,
-    factory: ShaderRunConfigurationFactory?,
+    factory: ShaderRunConfigurationFactory,
     name: String?
-) : RunConfigurationBase<FragShaderRunOptions>(project, factory, name) {
+) : LocatableConfigurationBase<FragShaderRunOptions>(project, factory, name) {
 
 
     override fun getOptions(): FragShaderRunOptions {
@@ -41,6 +41,10 @@ class ShaderRunConfiguration(
 
     fun setUniformName(uniform: UniformType, name: String) {
         options.setUniformName(uniform, name);
+    }
+
+    fun setUniformNames(uniforms: Map<UniformType, String>) {
+        options.setUniformMappings(uniforms)
     }
 
     fun getUniforms(): Map<UniformType, String> {

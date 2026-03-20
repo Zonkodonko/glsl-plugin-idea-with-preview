@@ -2,6 +2,7 @@ package glsl.plugin.preview.run.settings
 
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
+import com.intellij.execution.configurations.LocatableRunConfigurationOptions
 import com.intellij.execution.configurations.RunConfigurationOptions
 import com.intellij.openapi.editor.Document
 import com.intellij.openapi.fileEditor.FileDocumentManager
@@ -14,7 +15,7 @@ public val EMPTY_FILE_INPUT = "EMPTY"
 /**
  * Data class for run - options of fragment shaders
  */
-class FragShaderRunOptions() : RunConfigurationOptions() {
+class FragShaderRunOptions() : LocatableRunConfigurationOptions() {
     var fragmentFile: String? by string()
     var vertexFile: String? by string()
     var uniformMappingsRaw: String? by string()
@@ -25,6 +26,10 @@ class FragShaderRunOptions() : RunConfigurationOptions() {
      */
     fun getUniformMappings(): Map<UniformType, String> {
         return jacksonObjectMapper().readValue<Map<UniformType, String>>(uniformMappingsRaw ?: "{}")
+    }
+
+    fun setUniformMappings(uniformMappings: Map<UniformType, String>) {
+        uniformMappingsRaw = jacksonObjectMapper().writeValueAsString(uniformMappings)
     }
 
     /**

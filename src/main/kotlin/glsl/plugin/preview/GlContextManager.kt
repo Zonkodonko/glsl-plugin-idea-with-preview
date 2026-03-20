@@ -3,10 +3,10 @@ package glsl.plugin.preview
 import com.intellij.execution.process.ProcessEvent
 import com.intellij.execution.process.ProcessListener
 import com.intellij.openapi.Disposable
-import com.intellij.openapi.editor.Document
 import com.intellij.openapi.project.Project
 import fleet.util.computeIfAbsentShim
 import glsl.plugin.preview.run.GLProcessHandler
+import glsl.plugin.preview.run.ShaderProgramCompiler
 import glsl.plugin.preview.run.settings.FragShaderRunOptions
 import glsl.plugin.preview.run.settings.UniformType
 import glsl.plugin.utils.exceptions.ShaderCompilerException

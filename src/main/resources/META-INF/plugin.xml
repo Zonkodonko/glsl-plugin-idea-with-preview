@@ -94,6 +94,8 @@
         />
 
         <configurationType implementation="glsl.plugin.preview.run.settings.ShaderRunConfigurationType"/>
+        <runConfigurationProducer language="Glsl" implementation="glsl.plugin.preview.run.gutteraction.FragShaderLazyRunConfigProducer"/>
+        <runLineMarkerContributor language="Glsl" implementationClass="glsl.plugin.preview.run.gutteraction.FragShaderRunLineMarkerContributor"/>
 
     </extensions>
 
