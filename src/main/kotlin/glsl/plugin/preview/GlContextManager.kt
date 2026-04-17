@@ -150,8 +150,7 @@ class GlContextManager : Disposable {
         try {
             println("Compiling shader program:")
             val shaderProgramCompiler = ShaderProgramCompiler(compileRun.processHandler);
-            this.programId = shaderProgramCompiler.getProgramFromFrag(compileRun.settings.getFragDocument().text)//todo this causes a thread exception because getFragDocument is a psi read operation. Maybe we should cache that instead
-            setupRenderContext(compileRun.settings.getUniformMappings())
+            this.programId = shaderProgramCompiler.getProgramFromFrag(compileRun.settings.getFragDocument().text)
             runShaderProgram()
         } catch (e: Exception) {
             if (e is ShaderCompilerException) {

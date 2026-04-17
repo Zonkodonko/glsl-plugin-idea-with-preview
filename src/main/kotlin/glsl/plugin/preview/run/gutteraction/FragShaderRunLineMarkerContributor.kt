@@ -7,7 +7,6 @@ import com.intellij.psi.impl.source.tree.LeafPsiElement
 import glsl.plugin.preview.run.FragmentShaderRunAction
 import glsl.plugin.utils.idea.isInFragFile
 import glsl.psi.interfaces.GlslFunctionDeclarator
-import glsl.psi.interfaces.GlslFunctionDefinition
 
 class FragShaderRunLineMarkerContributor : RunLineMarkerContributor() {
 
