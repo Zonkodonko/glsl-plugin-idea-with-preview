@@ -67,7 +67,7 @@ configurations.configureEach {
     resolutionStrategy.eachDependency {
         if (requested.group == "org.lwjgl") {
             useVersion(libs.versions.lwjgl.get())
-            because("Alle LWJGL-Artefakte müssen binär kompatibel zu lwjgl3-awt sein")
+            because("All LWJGL artifacts must be compatible with lwjgl3-awt")
         }
     }
 }
