@@ -1,6 +1,7 @@
 package glsl.plugin.preview.run.settings
 
 import com.intellij.icons.AllIcons
+import com.intellij.ide.HelpTooltip
 import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.observable.properties.PropertyGraph
 import com.intellij.openapi.options.SettingsEditor
@@ -23,7 +24,7 @@ import javax.swing.JComboBox
 import javax.swing.JComponent
 
 /**
- *
+ * View controller for the run configuration dialog
  */
 class ShaderSettingsEditor : SettingsEditor<ShaderRunConfiguration>() {
 
@@ -84,7 +85,11 @@ class ShaderSettingsEditor : SettingsEditor<ShaderRunConfiguration>() {
     }
 
     override fun createEditor(): JComponent {
-        val smallErrorIcon = IconUtil.scale(AllIcons.General.ErrorDialog, null, 0.8f) //need that scale because setting size or maximumsize to the icon has no effect
+        val smallErrorIcon = IconUtil.scale(
+            AllIcons.General.ErrorDialog,
+            null,
+            0.8f
+        ) //need that scale because setting the size or maximumsize to the icon has no effect
         val listboxRow: JBPanel<DialogPanel> = panel {
             row {
                 cell(fileListbox).gap(RightGap.SMALL)
@@ -111,8 +116,12 @@ class ShaderSettingsEditor : SettingsEditor<ShaderRunConfiguration>() {
         }
         val uniformSectionLayout = java.awt.GridBagLayout() //maybe replace with kotlin ui dsl
         val uniformGrid = JBPanel<JBPanel<*>>(uniformSectionLayout)
-        uniforms.forEach { (type, inputComponent) ->
-            val label = JBLabel(type.label)
+        uniforms.forEach { (uniform, inputComponent) ->
+            val label = JBLabel(uniform.label)
+            val tooltip = HelpTooltip();
+            tooltip.description = uniform.tooltip;
+            tooltip.installOn(label);
+
             label.labelFor = inputComponent
 
             constraints.weightx = 0.0

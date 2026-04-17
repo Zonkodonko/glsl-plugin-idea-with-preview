@@ -7,7 +7,11 @@ import com.intellij.psi.util.elementType
 import glsl.plugin.psi.named.variables.GlslNamedSingleDeclaration
 import glsl.psi.interfaces.GlslSingleDeclaration
 
-
+/**
+ * Modify the run configuration based on the shader file. Like extracting uniform names.
+ * @param configuration The run configuration to modify
+ * @param psiFile The shader file
+ */
 fun modifyOptionsFromShaderSourceFile(configuration: ShaderRunConfiguration, psiFile: PsiFile) {
     psiFile.let {
         configuration.setFragmentFile(it.virtualFile.url)
