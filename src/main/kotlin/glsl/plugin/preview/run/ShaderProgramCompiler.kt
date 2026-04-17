@@ -55,8 +55,6 @@ class ShaderProgramCompiler {
 
     /**
      * Compile program from vertex shader and fragment shader.
-     * @param vertexShaderId
-     * @param fragShaderId
      * @return program ID
      */
     private fun compileProgram(): Int {
