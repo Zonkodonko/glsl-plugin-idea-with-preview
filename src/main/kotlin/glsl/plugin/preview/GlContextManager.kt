@@ -247,8 +247,9 @@ class GlContextManager : Disposable {
      * Rende GL context stuff and update uniforms.
      */
     private fun render() {
-        val w = glCanvas.width.coerceAtLeast(1)
-        val h = glCanvas.height.coerceAtLeast(1)
+        val w = (glCanvas.width.coerceAtLeast(1) * glCanvas.graphicsConfiguration.defaultTransform.scaleX).toInt()
+        val h = (glCanvas.height.coerceAtLeast(1) * glCanvas.graphicsConfiguration.defaultTransform.scaleY).toInt()
+
 
         glViewport(0, 0, w, h)
         glClearColor(0f, 0f, 0f, 1f)
