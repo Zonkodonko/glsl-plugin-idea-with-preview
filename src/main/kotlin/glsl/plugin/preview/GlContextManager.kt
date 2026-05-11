@@ -1,9 +1,13 @@
 package glsl.plugin.preview
 
 import com.intellij.execution.process.ProcessEvent
+import com.intellij.execution.process.ProcessHandler
 import com.intellij.execution.process.ProcessListener
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.ui.popup.JBPopupFactory
+import com.jetbrains.rd.util.string.print
+import com.jetbrains.rd.util.string.println
 import fleet.util.computeIfAbsentShim
 import glsl.plugin.preview.run.GLProcessHandler
 import glsl.plugin.preview.run.ShaderProgramCompiler
@@ -39,6 +43,7 @@ class GlContextManager : Disposable {
 
 
     private var pendingCompile: CompileRun? = null
+    private var currentRunning: GLProcessHandler? = null
     private var pendingStop: Boolean = false
 
     private data class CompileRun(val settings: FragShaderRunOptions, val processHandler: GLProcessHandler);
@@ -83,18 +88,19 @@ class GlContextManager : Disposable {
             }
 
             override fun paintGL() {
-                if (pendingCompile != null) {
-                    pendingCompile!!.processHandler.addProcessListener(processTerminatedListener)
-                    compile(pendingCompile!!)
-                    pendingCompile = null
-                }
                 if (pendingStop) {
                     glDeleteProgram(programId)
                     programId = -1
                     clearCanvas()
                     pendingStop = false
+                    currentRunning = null
                     return
-
+                }
+                if (pendingCompile != null) {
+                    pendingCompile!!.processHandler.addProcessListener(processTerminatedListener)
+                    compile(pendingCompile!!)
+                    currentRunning = pendingCompile!!.processHandler
+                    pendingCompile = null
                 }
                 if (programId != -1) {
                     this@GlContextManager.render()
@@ -143,7 +149,24 @@ class GlContextManager : Disposable {
      * The request will be handled with the next render cycle.
      */
     fun queueCompile(runOptions: FragShaderRunOptions, processHandler: GLProcessHandler) {
-        pendingCompile = CompileRun(runOptions, processHandler)
+        if(this.currentRunning != null) {
+            JBPopupFactory.getInstance().createConfirmation(
+                "Cancel current shader program?",
+                "Yes","No",
+                {
+                    this.currentRunning!!.printStdout("Stopping current shader program... (Triggered by user)")
+                    this.currentRunning!!.terminate(200)
+                    this.currentRunning = null
+                    this.pendingCompile = CompileRun(runOptions, processHandler)
+                },
+                {
+                    processHandler.terminate(200)
+                },
+                0
+            ).showCenteredInCurrentWindow(project)
+        } else {
+            pendingCompile = CompileRun(runOptions, processHandler)
+        }
     }
 
     private fun compile(compileRun: CompileRun) {
